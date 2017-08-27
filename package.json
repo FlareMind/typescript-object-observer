@@ -1,0 +1,26 @@
+{
+  "name": "typescript-proxy-observer",
+  "version": "1.0.0",
+  "description": "Makes objects observable in Typescript.",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "repository": "https://github.com/FlareMind/typescript-proxy-observer.git",
+  "author": "Flare Mind <info@flaremind.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p ./tsconfig.json",
+    "test": "mocha -r ts-node/register test/*.ts"
+  },
+  "dependencies": {
+    "typescript-observable": "^1.0.9"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.3",
+    "@types/mocha": "^2.2.41",
+    "chai": "^4.1.1",
+    "mocha": "^3.5.0",
+    "simple-mock": "^0.8.0",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.4.2"
+  }
+}
