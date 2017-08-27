@@ -1,4 +1,4 @@
-# typescript-obnject-observer
+# typescript-object-observer
 Class used to observe objects in Typescript.
 
 ### Installation
