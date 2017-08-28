@@ -4,7 +4,6 @@ import {ICancel, IObservable, IObserver, Observable} from "typescript-observable
 import {IFactoryConfig} from "./object-observer-factory";
 import {ChangeEvent} from "./events";
 
-
 export class ObjectObserverFallback<T> implements IObjectObserver<T> {
 
     private observers : IObservable = new Observable();
@@ -16,6 +15,7 @@ export class ObjectObserverFallback<T> implements IObjectObserver<T> {
     constructor(observed : T, config : IFactoryConfig) {
         this.observed = observed;
         this.config = config;
+        this.hashCode = hashCode(this.observed);
     }
 
     getObserved(): T {
@@ -23,13 +23,15 @@ export class ObjectObserverFallback<T> implements IObjectObserver<T> {
     }
 
     on(type: EventType | EventType[], callback: ObserverCallback | IObserver) : ICancel {
+        let cancel : ICancel = this.observers.on(type, callback);
         this.startInterval();
-        return this.observers.on(type, callback);
+        return cancel;
     }
 
     off(observer: IObserver): boolean {
+        let success = this.observers.off(observer);
         this.stopInterval();
-        return this.observers.off(observer);
+        return success;
     }
 
     countObservers() : number {
@@ -45,7 +47,9 @@ export class ObjectObserverFallback<T> implements IObjectObserver<T> {
 
         // Start interval if there is observers and the interval is off
         if (this.interval === null && this.countObservers() > 0) {
-            this.interval = window.setInterval(this.update(), this.config.fallbackUpdateFrequency);
+            this.interval = setInterval(() => {
+                this.update();
+            }, this.config.fallbackUpdateFrequency || 100);
         }
     }
 
@@ -53,19 +57,25 @@ export class ObjectObserverFallback<T> implements IObjectObserver<T> {
 
         // Clear interval if there is no observers
         if (this.interval !== null && this.countObservers() === 0) {
-            window.clearInterval(this.interval);
+            clearInterval(this.interval);
             this.interval = null;
         }
     }
 
     private update() : void {
+
+        if (this.observed === undefined) {
+            return;
+        }
+
         let newHash : number = hashCode(this.observed);
 
         // Notify observers if hash has changed
         if (this.hashCode !== newHash) {
             this.hashCode = newHash;
             this.observers.notify(ChangeEvent, {
-                type: 'change'
+                type: 'change',
+                target: this.observed
             });
         }
     }

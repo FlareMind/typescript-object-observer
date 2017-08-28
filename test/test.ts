@@ -1,21 +1,22 @@
 import 'mocha'
 import {expect} from 'chai'
-import {ObjectObserver} from "../src/index";
+import {ObjectObserver} from "../src/object-observer";
 import {IObserver} from "typescript-observable";
+import {IObjectObserver} from "../src/interfaces/object-observer";
 
 
 const NUM_ITEMS_BEFORE_DELETE = 10,
-    NUM_OBSERVERS_TO_ADD = 10;
+      NUM_OBSERVERS_TO_ADD = 10;
 
 type StringIndex<T> = {
     [index : string] : T;
 };
 
 
-describe('ProxyObserver', () => {
+describe('ObjectObserver', () => {
 
     describe('observers', () => {
-        let objectObserver : ObjectObserver<string[]>;
+        let objectObserver : IObjectObserver<string[]>;
 
         beforeEach(() => {
             objectObserver = new ObjectObserver<string[]>([]);
@@ -65,18 +66,18 @@ describe('ProxyObserver', () => {
 
     describe('observe objects', () => {
 
-        let proxyObserver : ObjectObserver<StringIndex<string>>,
+        let objectObserver : IObjectObserver<StringIndex<string>>,
             observed : StringIndex<string>;
 
         describe('set', () => {
 
             beforeEach(() => {
-                proxyObserver = new ObjectObserver<StringIndex<string>>({});
-                observed      = proxyObserver.getObserved();
+                objectObserver = new ObjectObserver<StringIndex<string>>({});
+                observed      = objectObserver.getObserved();
             });
 
             it('should notify observers when a value is set', done => {
-                proxyObserver.on('set', data => {
+                objectObserver.on('set', data => {
                     if (!isSetEventData(data)) {
                         done(new Error('Expected data from a SetEvent'))
                     }
@@ -103,14 +104,14 @@ describe('ProxyObserver', () => {
         describe('delete', () => {
 
             beforeEach(() => {
-                proxyObserver = new ObjectObserver<StringIndex<string>>({
+                objectObserver = new ObjectObserver<StringIndex<string>>({
                     'foo': 'bar'
                 });
-                observed      = proxyObserver.getObserved();
+                observed      = objectObserver.getObserved();
             });
 
             it('should notify observers when a value is set', done => {
-                proxyObserver.on('delete', data => {
+                objectObserver.on('delete', data => {
                     if (!isDeleteEventData(data)) {
                         done(new Error('Expected data from a DeleteEvent'))
                     }
@@ -132,18 +133,18 @@ describe('ProxyObserver', () => {
 
     describe('observe arrays', () => {
 
-        let proxyObserver : ObjectObserver<string[]>,
+        let objectObserver : IObjectObserver<string[]>,
             observed : string[];
 
         describe('set', () => {
 
             beforeEach(() => {
-                proxyObserver = new ObjectObserver<string[]>([]);
-                observed      = proxyObserver.getObserved();
+                objectObserver = new ObjectObserver<string[]>([]);
+                observed      = objectObserver.getObserved();
             });
 
             it('should notify observers listening to SetEvent when a value is set', done => {
-                proxyObserver.on('set', data => {
+                objectObserver.on('set', data => {
                     if (!isSetEventData(data)) {
                         done(new Error('Expected data from a SetEvent'))
                     }
@@ -167,7 +168,7 @@ describe('ProxyObserver', () => {
             });
 
             it('should notify observers listening to SetEvent on push', done => {
-                proxyObserver.on('set', data => {
+                objectObserver.on('set', data => {
                     if (!isSetEventData(data)) {
                         done(new Error('Expected data from a SetEvent'))
                     }
@@ -197,16 +198,16 @@ describe('ProxyObserver', () => {
 
         describe('delete', () => {
             beforeEach(() => {
-                proxyObserver = new ObjectObserver<string[]>(
+                objectObserver = new ObjectObserver<string[]>(
                     Array
                         .apply(null, {length: NUM_ITEMS_BEFORE_DELETE})
                         .map(Number.call, Number)
                 );
-                observed      = proxyObserver.getObserved();
+                observed      = objectObserver.getObserved();
             });
 
             it('should notify observers listening to DeleteEvent when splice', done => {
-                proxyObserver.on('delete', data => {
+                objectObserver.on('delete', data => {
                     if (!isDeleteEventData(data)) {
                         done(new Error('Expected data from a DeleteEvent'));
                     }
@@ -221,7 +222,7 @@ describe('ProxyObserver', () => {
             });
 
             it('should notify observers listening to DeleteEvent when shift', done => {
-                proxyObserver.on('delete', data => {
+                objectObserver.on('delete', data => {
                     if (!isDeleteEventData(data)) {
                         done(new Error('Expected data from a DeleteEvent'));
                     }
@@ -236,7 +237,7 @@ describe('ProxyObserver', () => {
             });
 
             it('should notify observers listening to DeleteEvent when delete', done => {
-                proxyObserver.on('delete', data => {
+                objectObserver.on('delete', data => {
                     if (!isDeleteEventData(data)) {
                         done(new Error('Expected data from a DeleteEvent'));
                     }
@@ -250,24 +251,6 @@ describe('ProxyObserver', () => {
                 expect(observed[0]).to.be.undefined;
             });
         });
-    });
-
-    it('sould work', () => {
-
-        type StringDict = {[index : string] : string};
-
-        let proxyObserver = new ObjectObserver<StringDict>({}),
-            observedArray = proxyObserver.getObserved();
-
-        proxyObserver.on('change', data => {
-            console.log('ChangeEvent');
-        });
-
-        /*
-         * Prints:
-         * Object changed
-         */
-        observedArray['foo'] = 'bar';
     });
 });
 
