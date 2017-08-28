@@ -12,14 +12,15 @@
     "test": "mocha -r ts-node/register test/*.ts"
   },
   "dependencies": {
-    "typescript-observable": "^1.0.9"
+    "@types/core-js": "^0.9.43",
+    "core-js": "^2.5.0",
+    "typescript-observable": "^1.0.10"
   },
   "devDependencies": {
     "@types/chai": "^4.0.3",
     "@types/mocha": "^2.2.41",
     "chai": "^4.1.1",
     "mocha": "^3.5.0",
-    "simple-mock": "^0.8.0",
     "ts-node": "^3.3.0",
     "typescript": "^2.4.2"
   }

@@ -1,41 +1,12 @@
-import {ICancel, IObservableEvent, IObserver, Observable} from 'typescript-observable'
-import {IObjectObserverConfig} from './interfaces/object-observer-config'
+import {ICancel, IObservable, IObserver, Observable} from 'typescript-observable'
 import {DeleteEvent, SetEvent} from "./events";
 import {EventType, IObjectObserver} from "./interfaces/object-observer";
 import {ObserverCallback} from "typescript-observable/dist/interfaces/observer";
 
 
 export class ObjectObserver<T> implements IObjectObserver<T>{
-    private observers = new Observable();
+    private observers : IObservable = new Observable();
     private observed : T;
-
-    /*
-     * Define default notifiers.
-     * In future this might be overridable (therefore the existence of the interface IProxyConfig)
-     */
-    private proxyConfig : IObjectObserverConfig<T> = {
-
-        // Notify on SetEvent
-        notifyOnSet: (observers, target, property, value, receiver) => {
-            observers.notify(SetEvent, {
-                type: 'set',
-                target: target,
-                property: property,
-                value: value,
-                receiver: receiver
-            });
-        },
-
-        // Notify on DeleteEvent
-        notifyOnDelete : (observers, success, target, property) => {
-            observers.notify(DeleteEvent, {
-                type: 'delete',
-                success: success,
-                target: target,
-                property: property
-            });
-        }
-    };
 
     constructor(observed : T) {
 
@@ -45,7 +16,15 @@ export class ObjectObserver<T> implements IObjectObserver<T>{
             // Run standard behaviour on set and call notifiers
             set: (target : any, property : string | number, value : any, receiver : any) : boolean => {
                 target[property] = value;
-                this.proxyConfig.notifyOnSet(this.observers, <T> target, property, value, receiver);
+
+                this.observers.notify(SetEvent, {
+                    type: 'set',
+                    target: target,
+                    property: property,
+                    value: value,
+                    receiver: receiver
+                });
+
                 return true;
             },
 
@@ -57,7 +36,13 @@ export class ObjectObserver<T> implements IObjectObserver<T>{
                     delete target[property];
                 }
 
-                this.proxyConfig.notifyOnDelete(this.observers, success, <T> target, property);
+                this.observers.notify(DeleteEvent, {
+                    type: 'delete',
+                    success: success,
+                    target: target,
+                    property: property
+                });
+
                 return success;
             }
         });
@@ -67,8 +52,7 @@ export class ObjectObserver<T> implements IObjectObserver<T>{
         return this.observed;
     };
 
-    on(type: EventType | EventType[], callback: ObserverCallback | IObserver)
-    : ICancel {
+    on(type: EventType | EventType[], callback: ObserverCallback | IObserver) : ICancel {
         return this.observers.on(type, callback);
     }
 
