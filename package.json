@@ -1,5 +1,5 @@
 {
-  "name": "typescript-proxy-observer",
+  "name": "typescript-object-observer",
   "version": "1.0.0",
   "description": "Makes objects observable in Typescript.",
   "main": "./dist/index.js",
