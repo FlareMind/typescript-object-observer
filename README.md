@@ -1,4 +1,6 @@
 # typescript-object-observer
+[![Build Status](https://travis-ci.org/FlareMind/typescript-object-observer.svg?branch=master)](https://travis-ci.org/FlareMind/typescript-object-observer.svg?branch=master)
+
 Class used to observe objects in Typescript.
 
 The `ObjectObserver` uses a `Proxy` to intercept calls. When `Proxy` is unavailable fallack mode is used.
